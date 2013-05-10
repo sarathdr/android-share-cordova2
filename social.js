@@ -1,7 +1,7 @@
  
  var SocialShare = function() {};
 
-SocialShare.prototype.sms = function(param, successCallback, failCallback) {
+SocialShare.sms = function(param, successCallback, failCallback) {
 
     function success(args) {
         successCallback(args);
@@ -19,7 +19,7 @@ SocialShare.prototype.sms = function(param, successCallback, failCallback) {
 };
  
  
- SocialShare.prototype.email = function(param, successCallback, failCallback) {
+ SocialShare.email = function(param, successCallback, failCallback) {
 
     function success(args) {
         successCallback(args);
@@ -37,7 +37,7 @@ SocialShare.prototype.sms = function(param, successCallback, failCallback) {
 };
  
  
-  SocialShare.prototype.social = function(param, successCallback, failCallback) {
+  SocialShare.social = function(param, successCallback, failCallback) {
 
     function success(args) {
         successCallback(args);
@@ -54,5 +54,20 @@ SocialShare.prototype.sms = function(param, successCallback, failCallback) {
 	}, 'SocialShare', 'startSocialActivity', [param]);
 };
  
- 
+  SocialShare.twitter = function(param, successCallback, failCallback) {
+
+    function success(args) {
+        successCallback(args);
+    }
+
+    function fail(args) {
+    	failCallback(args);
+    }
+
+	return PhoneGap.exec(function(args) {
+		success(args);
+	}, function(args) {
+		fail(args);
+	}, 'SocialShare', 'startTwitterActivity', [param]);
+}; 
  
