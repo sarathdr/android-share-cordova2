@@ -1,13 +1,21 @@
-package com.sarathdr.plugins.SocialShare;
+package com.linkme.plugins.SocialShare;
+
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.R;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 
+import org.apache.cordova.api.LegacyContext;
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
 
@@ -42,6 +50,13 @@ public class SocialShare extends Plugin {
 				String msg = obj.has("message") ? obj.getString("message") : "";
 				
 				startSocialActivity(msg);
+			}
+			else if( action.equals("startTwitterActivity") ) 
+			{
+				JSONObject obj = args.getJSONObject(0);
+				String msg = obj.has("message") ? obj.getString("message") : "";
+				
+				startTwitterActivity(msg);
 			}
 			
 		}
@@ -86,9 +101,39 @@ public class SocialShare extends Plugin {
 		emailIntent.setType("text/plain");
 		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, msg );
 		
-		this.ctx.startActivity(Intent.createChooser(emailIntent, "Share Dead Tone in:")); 
+		this.ctx.startActivity(Intent.createChooser(emailIntent, "Share in:")); 
 	}
 	
+	public void startTwitterActivity ( String msg )
+	{
+
+		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+		shareIntent.setType("text/plain");
+
+		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,msg);
+		PackageManager pm = cordova.getActivity().getPackageManager();
+		
+		System.out.println("Messaggio da buttare a twetter: "+ msg);
+		
+		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
+		
+		for (final ResolveInfo app : activityList) {
+			System.out.println(app.activityInfo.name);
+			if ((app.activityInfo.name).equals("com.twitter.android.PostActivity")) {
+				System.out.println("Cazzo sono uguali!!");
+				final ActivityInfo activity = app.activityInfo;
+				final ComponentName name = new ComponentName(
+						activity.applicationInfo.packageName, activity.name);
+				shareIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+				shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+						| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+				shareIntent.setComponent(name);
+				cordova.getActivity().getBaseContext().startActivity(shareIntent);
+//				this.ctx.startActivity(Intent.createChooser(shareIntent, "Share in:"));
+				break;
+			}
+		}
+	}
 	
 
 	@Override
